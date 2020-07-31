@@ -1,0 +1,13 @@
+nav{
+    background-color: rgb(98, 98, 238);
+    font-size: 1.5em;
+}
+
+#main-logo{
+    max-width: 20em;
+    max-height: 20em;
+}
+
+.dropdown-item{
+    font-size: 1.3em;
+}
