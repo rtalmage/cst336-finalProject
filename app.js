@@ -19,39 +19,24 @@ app.get("/about", function(req, res){
 });
 
 // Dynamic Sports Route
-app.get("/sport", function(req, res){
+app.get("/sport", async function(req, res){
 
-    let sportSelection = req.query.sportSelection;
+    let sportSelection = req.query.sportSelection; // Obtain user's selection from Navbar
 
-    res.render("sports", {"sportSelection": sportSelection});
+    let productObject = await getProducts(sportSelection); // Create and store object with API info
 
-    // // Dynamically populate the sports page with Walmart API,
-    // // based off the user's selection from drop down
-    // switch (sportSelection){
-    //     case "baseball":
-    //         // Render baseball products from Walmart API
-    //         break;
-    //     case "cycling":
-    //         // Render cycling products from Walmart API
-    //         break;
-    //     case "fitness":
-    //         // Render fitness products from Walmart API
-    //         break;
-    //     case "football":
-    //         // Render football products from Walmart API
-    //         break;
-    //     case "soccer":
-    //         // Render soccer products from Walmart API
-    //         break;
-    // }
+    res.render("sports", {"productObject": productObject});
 
 });
 
 // Search Route
-app.get("/search", function(req, res){
+app.get("/search", async function(req, res){
 
-    let itemSearch = req.query.itemSearch;
-    res.render("results", {"itemSearch": itemSearch});
+    let itemSearch = req.query.itemSearch; // Obtain user's search string
+
+    let productObject = await getProducts(itemSearch); // Create and store object with API info
+
+    res.render("sports", {"productObject": productObject});
 });
 
 // Shopping Cart Route
@@ -59,6 +44,43 @@ app.get("/cart", function(req, res){
 
     res.render("cart");
 });
+
+// Get sport products from Walmart API
+function getProducts(sport){
+
+    // Await expression waits for a promise, so a promise must be returned here
+    return new Promise(function(resolve, reject){
+        let requestUrl = `http://api.walmartlabs.com/v1/search?query=${sport}&format=json&apiKey=7eksjp57nqzw9hnb9hsudh93`;
+
+        request(requestUrl, function(error, response, body){
+            if(!error && response.statusCode == 200){
+                let parsedData = JSON.parse(body);
+                let productObject = []; // Declare Product Object
+
+                // Current API call only retrieves 10 items
+                let count = parsedData.items.length; // Constrain count if need +/- than 10
+
+                // Fill object with Name, Price, and ImageUrl for first <= 10 results
+                for(let i = 0; i < count; i++){
+                    productObject.push(
+                        {
+                            productName: parsedData.items[i].name,
+                            productPrice: parsedData.items[i].salePrice,
+                            productImagePath: parsedData.items[i].imageEntities[0].mediumImage
+                        }
+                    );
+                }
+
+                resolve(productObject); // Use resolve to return the productObject
+            }
+            else{
+                console.log('error:', error);
+                console.log('statusCode:', response && response.statusCode);
+                reject(error); // Use reject to pass error value
+            }
+        });
+    });
+}
 
 // Starting Server on local machine (For Dev)
 app.listen("8080", "127.0.0.1", function(){
