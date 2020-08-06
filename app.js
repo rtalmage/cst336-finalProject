@@ -1,10 +1,13 @@
 const express = require("express");
 const app = express();
 const request = require("request"); // Import request package
-const pool = require("./dbPool.js"); // Import the DB File
+const conn = require("./dbPool.js"); // Import the DB File
+const session = require("express-session");
+const bcrypt = require("bcrypt");
 
 app.set("view engine", "ejs");
 app.use(express.static("public")); // Use public folder for all static files
+app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
 // Landing Page Route
 app.get("/", function(req, res){
@@ -45,7 +48,32 @@ app.get("/cart", function(req, res){
     res.render("cart");
 });
 
-// Get sport products from Walmart API
+// Admin Login Page
+app.get("/login", function(req, res){
+    res.render("adminLogin");
+});
+
+// Admin POST route, calls verifyAdmin()
+app.post("/login", async function(req, res){
+    let username = req.body.username;
+    let password = req.body.password;
+    // res.send("Username: " + username + "<br/>Password: " + password);
+
+    let authenticateUser = await verifyAdmin(username, password);
+
+    if(authenticateUser){
+        res.render("adminPortal", {"username": username});
+    }
+    else{
+        res.send("Username or password is incorrect");
+    }
+});
+
+/*
+ * Get sport products from Walmart API.
+ * @param {string} sport
+ * @return {object} sport-object 
+*/
 function getProducts(sport){
 
     // Await expression waits for a promise, so a promise must be returned here
@@ -80,6 +108,57 @@ function getProducts(sport){
             }
         });
     });
+}
+
+/*
+ * Checks if username and password match database entry.
+ * @param {string} username
+ * @param {string} password
+ * @return {boolean} true if found, false otherwise
+*/
+function verifyAdmin(username, password){
+    let sqlUsername = "SELECT * FROM users WHERE username =?";
+    let authenticated;
+
+    return new Promise(function(resolve, reject){
+        conn.query(sqlUsername, [username], async function(err, rows, fields){
+            if(err) throw err;
+
+            // If username exists in database, call verifyPassword()
+            if(rows.length > 0){
+                // console.log(rows[0].username + ", " + rows[0].password);
+                if(rows[0].username == username){
+                    let passwordCheck = await verifyPassword(password, rows[0].password);
+                    passwordCheck ? resolve(true) : resolve(false); // if match return true, false otherwise
+                    // console.log("password check = " + passwordCheck);
+                }
+                else{
+                    authenticated = false;
+                }
+            }
+
+            resolve(authenticated);
+        });//query
+    });//promise
+}
+
+/*
+ * Checks if user password matches the hashed password in the database.
+ * Will only execute if the username is found.
+ * @param {string} password
+ * @param {string} hashedPassword
+ * @return {boolean} true if found, false otherwise
+*/
+function verifyPassword(password, hashedPassword){
+    return new Promise(function(resolve, reject){
+
+        // Compare hashed password with users password
+        bcrypt.compare(password, hashedPassword, function(err, result){
+            // console.log("Result: " + result);
+            if(err) throw err;
+            resolve(result);
+        });//bcrypt
+    });//promise
 }
 
 // Starting Server on local machine (For Dev)
