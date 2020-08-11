@@ -1,7 +1,5 @@
 <%- include('partials/header.ejs') %>
 
-<%- include('partials/footer.ejs') %>
-
 <body class="text-center">
 
     <main>
@@ -10,22 +8,43 @@
 
         <div class="container">
 
+            <% if(cartObj.length < 1){ %>
+                <br/><h2>Your Shopping Cart Is Empty</h2>
+            <% } %>
 
+            <% if(cartObj.length > 0 ){ %>
 
-                    <div class="col-lg card-columns">
-                        <div class="card" style="width: 18rem;">
-                            <h5 class="card-title"><%= cartObj[0].productName %></h5>
-                            <img class="img-fluid" src="<%= cartObj[0].productImagePath %>" class="card-img-top" alt="Product Image">
-                            <div class="card-body">
-                                <p class="card-text">Price: $<%= cartObj[0].productPrice %></p>
+                <br/><h2><strong>Your Shopping Cart</strong></h2>
+                <a class="btn btn-success" id="checkoutBtn">Proceed To Checkout</a><br/><br/>
+
+                <% for(let i = 0; i < cartObj.length; i++){
+                
+                        if(i % 2 == 0){ %>
+                            <div class="row">
+                    <% } %>
+
+                        <div class="col-lg card-columns productCart">
+                            <div class="card" style="width: 18rem;">
+                                <h5 class="card-title sportName"><%= cartObj[i].productName %></h5>
+                                <img class="img-fluid sportImage" src="<%= cartObj[i].productImagePath %>" class="card-img-top" alt="Product Image">
+                                <div class="card-body">
+                                    <p class="card-text sportPrice">Price: $<%= cartObj[i].productPrice %></p>
+                                    <a class="btn btn-danger deletecartbtn" id="<%= i %>">Remove From Cart</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                    <% if(i % 2 != 0){ %>
+                            </div>
+                    <% }
+                } %>
+            <% } %>
 
         </div>
 
     </main>
+
+<%- include('partials/footer.ejs') %>
 
 </body>
 </html>

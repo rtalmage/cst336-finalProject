@@ -1,27 +1,30 @@
 $(document).ready(function(){
-    
-    var cartObj = [];
-    
+
     $(".addcartbtn").on("click", function() {
-        var index = $(".addcartbtn").index(this);
-        console.log(index);
-        cartObj.push(productObject[index]);
+        let index = $(this).attr("id"); // Index of product in object
+        $(this).css("background-color", "grey")
+
+        sendIndexToCart(index);
     });
-    
-   
-   $("#cartbtn").on("click", function() {
-    $.ajax({ 
-      method: 'GET', 
-      url: '/cart', 
-      data: { "productName": cartObj[0].productName, "productImagePath": cartObj[0].productImagePath, "productPrice": cartObj[0].productPrice}, 
-      //dataType: 'json',
-      success: function (data) { 
-            console.log(data);
-        },
-         error: function(XMLHttpRequest, textStatus, errorThrown) {
-        alert("some error");
-        }
+
+    /*
+     * Sends the index to the /cart route in the controller.
+     * This index is used to populate the cart object data
+     * @param {int} index
+     * @return {object}
+    */
+    function sendIndexToCart(index){
+
+        $.ajax({ 
+            method: 'GET', 
+            url: '/cart',
+            data: {
+                "index": index
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("some error");
+            }
         });
-   });
+    }
 
 });
