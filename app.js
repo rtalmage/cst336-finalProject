@@ -44,8 +44,10 @@ app.get("/search", async function(req, res){
 
 // Shopping Cart Route
 app.get("/cart", function(req, res){
-
-    res.render("cart");
+    let cartObj = req.query.productName;
+    console.log(cartObj);
+    //var cartObj = req.body;
+    res.render("cart", {"cartObj": cartObj});
 });
 
 // Admin Login Page

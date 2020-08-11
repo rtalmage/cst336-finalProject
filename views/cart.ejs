@@ -1,0 +1,31 @@
+<%- include('partials/header.ejs') %>
+
+<%- include('partials/footer.ejs') %>
+
+<body class="text-center">
+
+    <main>
+
+        <!-- <h2>Your Sports Selection Is: </h2> -->
+
+        <div class="container">
+
+
+
+                    <div class="col-lg card-columns">
+                        <div class="card" style="width: 18rem;">
+                            <h5 class="card-title"><%= cartObj[0].productName %></h5>
+                            <img class="img-fluid" src="<%= cartObj[0].productImagePath %>" class="card-img-top" alt="Product Image">
+                            <div class="card-body">
+                                <p class="card-text">Price: $<%= cartObj[0].productPrice %></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+        </div>
+
+    </main>
+
+</body>
+</html>

@@ -1,4 +1,8 @@
 <%- include('partials/header.ejs') %>
+<script>
+    // stringify the data passed from router to ejs (within the EJS template only)
+    var parsed_data = <%- JSON.stringify(productObject) %>  
+</script>
 
 <body class="text-center">
 
@@ -20,7 +24,7 @@
                             <img class="img-fluid" src="<%= productObject[i].productImagePath %>" class="card-img-top" alt="Product Image">
                             <div class="card-body">
                                 <p class="card-text">Price: $<%= productObject[i].productPrice %></p>
-                                <a href="#" class="btn btn-primary">Add to cart</a>
+                                <a href="#" class="btn btn-primary addcartbtn">Add to cart</a>
                             </div>
                         </div>
                     </div>
