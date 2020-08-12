@@ -68,7 +68,27 @@ app.get("/search", async function(req, res){
 // Shopping Cart Route
 app.get("/cart", function(req, res){
 
-    res.render("cart");
+    let index = req.query.index; // Stores index of cart item selected
+
+    // If 'add to cart' btn triggered this route
+    if(index){
+        cartObj.push(
+            {
+                "productName": productObject[index].productName,
+                "productImagePath": productObject[index].productImagePath,
+                "productPrice": productObject[index].productPrice
+            }
+        );
+
+        // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
+        // console.log("Object Length: " + cartObj.length);
+    }
+
+    // Else, The user pressed the 'cart' btn in the header.ejs file
+    else{
+        res.render("cart", {"cartObj": cartObj});
+    }
+
 });
 
 // Admin Login Page
