@@ -9,6 +9,9 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
+// Global object
+let productObject; let cartObj = [];;
+
 // Landing Page Route
 app.get("/", function(req, res){
 
