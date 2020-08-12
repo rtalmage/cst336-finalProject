@@ -28,6 +28,7 @@ app.get("/sport", async function(req, res){
     let filterSelection = req.query.filterSelection; // Obtain user's filter selection
 
     productObject = await getProducts(sportSelection); // Create and store object with API info
+    productObject = await getProducts(sportSelection); // Create and store object with API info
     // Sort by user's filter selection
     if(filterSelection == "az") {
         productObject.sort((a, b) => (a.productName > b.productName) ? 1 : -1);
@@ -47,7 +48,7 @@ app.get("/search", async function(req, res){
     let itemSearch = req.query.itemSearch; // Obtain user's search string
     let filterSelection = req.query.filterSelection; // Obtain user's filter selection
 
-    productObject = await getProducts(itemSearch); // Create and store object with API info
+    let productObject = await getProducts(itemSearch); // Create and store object with API info
 
     if(productObject == undefined){
         res.render("itemNotFound");
@@ -184,7 +185,6 @@ function verifyPassword(password, hashedPassword){
         });//bcrypt
     });//promise
 }
-
 
 // Starting Server on local machine (For Dev)
 app.listen("8080", "127.0.0.1", function(){

@@ -1,0 +1,50 @@
+<%- include('partials/header.ejs') %>
+
+<body class="text-center">
+
+    <main>
+
+        <!-- <h2>Your Sports Selection Is: </h2> -->
+
+        <div class="container">
+
+            <% if(cartObj.length < 1){ %>
+                <br/><h2>Your Shopping Cart Is Empty</h2>
+            <% } %>
+
+            <% if(cartObj.length > 0 ){ %>
+
+                <br/><h2><strong>Your Shopping Cart</strong></h2>
+                <a class="btn btn-success" id="checkoutBtn">Proceed To Checkout</a><br/><br/>
+
+                <% for(let i = 0; i < cartObj.length; i++){
+                
+                        if(i % 2 == 0){ %>
+                            <div class="row">
+                    <% } %>
+
+                        <div class="col-lg card-columns productCart">
+                            <div class="card" style="width: 18rem;">
+                                <h5 class="card-title sportName"><%= cartObj[i].productName %></h5>
+                                <img class="img-fluid sportImage" src="<%= cartObj[i].productImagePath %>" class="card-img-top" alt="Product Image">
+                                <div class="card-body">
+                                    <p class="card-text sportPrice">Price: $<%= cartObj[i].productPrice %></p>
+                                    <a class="btn btn-danger deletecartbtn" id="<%= i %>">Remove From Cart</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    <% if(i % 2 != 0){ %>
+                            </div>
+                    <% }
+                } %>
+            <% } %>
+
+        </div>
+
+    </main>
+
+<%- include('partials/footer.ejs') %>
+
+</body>
+</html>
