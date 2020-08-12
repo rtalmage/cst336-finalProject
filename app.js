@@ -9,6 +9,9 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
+// Global object
+let productObject; let cartObj = [];;
+
 // Landing Page Route
 app.get("/", function(req, res){
 
@@ -26,7 +29,7 @@ app.get("/sport", async function(req, res){
 
     let sportSelection = req.query.sportSelection; // Obtain user's selection from Navbar
 
-    let productObject = await getProducts(sportSelection); // Create and store object with API info
+    productObject = await getProducts(sportSelection); // Create and store object with API info
 
     res.render("sports", {"productObject": productObject});
 
@@ -37,7 +40,7 @@ app.get("/search", async function(req, res){
 
     let itemSearch = req.query.itemSearch; // Obtain user's search string
 
-    let productObject = await getProducts(itemSearch); // Create and store object with API info
+    productObject = await getProducts(itemSearch); // Create and store object with API info
 
     if(productObject == undefined){
         res.render("itemNotFound");
@@ -51,7 +54,27 @@ app.get("/search", async function(req, res){
 // Shopping Cart Route
 app.get("/cart", function(req, res){
 
-    res.render("cart");
+    let index = req.query.index; // Stores index of cart item selected
+
+    // If 'add to cart' btn triggered this route
+    if(index){
+        cartObj.push(
+            {
+                "productName": productObject[index].productName,
+                "productImagePath": productObject[index].productImagePath,
+                "productPrice": productObject[index].productPrice
+            }
+        );
+
+        // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
+        // console.log("Object Length: " + cartObj.length);
+    }
+
+    // Else, The user pressed the 'cart' btn in the header.ejs file
+    else{
+        res.render("cart", {"cartObj": cartObj});
+    }
+
 });
 
 // Admin Login Page
