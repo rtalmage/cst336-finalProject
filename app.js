@@ -30,10 +30,20 @@ app.get("/about", function(req, res){
 app.get("/sport", async function(req, res){
 
     let sportSelection = req.query.sportSelection; // Obtain user's selection from Navbar
+    let filterSelection = req.query.filterSelection; // Obtain user's filter selection
 
     productObject = await getProducts(sportSelection); // Create and store object with API info
+    productObject = await getProducts(sportSelection); // Create and store object with API info
+    // Sort by user's filter selection
+    if(filterSelection == "az") {
+        productObject.sort((a, b) => (a.productName > b.productName) ? 1 : -1);
+    }
 
-    res.render("sports", {"productObject": productObject});
+    if(filterSelection == "price") {
+        productObject.sort((a, b) => (a.productPrice > b.productPrice) ? 1 : -1);
+    }
+
+    res.render("sports", {"productObject": productObject, "sportSelection": sportSelection});
 
 });
 
@@ -41,16 +51,23 @@ app.get("/sport", async function(req, res){
 app.get("/search", async function(req, res){
 
     let itemSearch = req.query.itemSearch; // Obtain user's search string
+    let filterSelection = req.query.filterSelection; // Obtain user's filter selection
 
-    productObject = await getProducts(itemSearch); // Create and store object with API info
+    let productObject = await getProducts(itemSearch); // Create and store object with API info
 
     if(productObject == undefined){
         res.render("itemNotFound");
     }
-
-    else {
-        res.render("sports", {"productObject": productObject});
+    //Sort by user's filter selection
+    if(filterSelection == "az") {
+        productObject.sort((a, b) => (a.productName > b.productName) ? 1 : -1);
     }
+
+    if(filterSelection == "price") {
+        productObject.sort((a, b) => (a.productPrice > b.productPrice) ? 1 : -1);
+    }
+
+    res.render("sports", {"productObject": productObject, "itemSearch": itemSearch});
 });
 
 // Shopping Cart Route
