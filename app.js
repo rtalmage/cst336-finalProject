@@ -10,7 +10,7 @@ app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
 // Global object
-let productObject; let cartObj = []; let total = 0;
+let productObject; let cartObj = [];;
 
 // Landing Page Route
 app.get("/", function(req, res){
@@ -72,44 +72,26 @@ app.get("/search", async function(req, res){
 app.get("/cart", function(req, res){
 
     let index = req.query.index; // Stores index of cart item selected
-    let indexDel = req.query.indexDel;
-    let qty = req.query.qty;
-    total = 0;
 
     // If 'add to cart' btn triggered this route
     if(index){
         cartObj.push(
             {
-                "productAmount": 1,
                 "productName": productObject[index].productName,
                 "productImagePath": productObject[index].productImagePath,
                 "productPrice": productObject[index].productPrice
             }
         );
+
         // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
         // console.log("Object Length: " + cartObj.length);
-    } 
-    else if(indexDel) {
-        cartObj.splice(indexDel,1);
-    }
-    
-    else if(qty){
-        cartObj[req.query.qtyIndex].productAmount = qty;
     }
 
     // Else, The user pressed the 'cart' btn in the header.ejs file
     else{
-        for(let i = 0; i < cartObj.length; i++) {
-            total += (cartObj[i].productPrice * cartObj[i].productAmount);
-        }
-        res.render("cart", {"cartObj": cartObj, "total": total});
+        res.render("cart", {"cartObj": cartObj});
     }
 
-});
-
-app.get("/cart/checkout", function(req, res) {
-    placeOrder(total, cartObj, Date.now());
-    res.render('/confirmation');
 });
 
 // Admin Login Page
@@ -225,14 +207,6 @@ function verifyPassword(password, hashedPassword){
             resolve(result);
         });//bcrypt
     });//promise
-}
-
-function placeOrder(orderAmount, items, date) {
-    let sql = "INSERT INTO orders VALUES (?,?,?,?)";
-       
-    conn.query(sql, [orderAmount, items, date], function(err, rows, fields){
-        if(err) throw err;
-    });
 }
 
 // Starting Server on local machine (For Dev)
