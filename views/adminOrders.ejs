@@ -1,0 +1,47 @@
+<%- include('partials/headerAdmin.ejs') %>
+
+<body class="text-center">
+
+    <main>
+
+        <div class="container">
+
+            <h2>ORDERS</h2>
+
+            <div class="row">
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="viewAllOrders">View All Orders</button>
+                </div>
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="viewTotalRevenue">View Total Revenue</button>
+                </div>
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="searchOrderNum">Search By Order Number</button>
+                </div>
+            </div>
+            
+            <hr/>
+
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Order Id</th>
+                        <th scope="col">Order Amount</th>
+                        <th scope="col">Items</th>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">User Id</th>
+                    </tr>
+                </thead>
+                <tbody id="orderTableContents">
+                    
+                </tbody>
+            </table>
+
+        </div>
+
+    </main>
+
+<%- include('partials/footer.ejs') %>
+
+</body>
+</html>

@@ -1,12 +1,30 @@
-<%- include('partials/header.ejs') %>
+<%- include('partials/headerAdmin.ejs') %>
 
 <body class="text-center">
 
     <main>
 
-        <h2>You are logged in as: <%= username %></h2>
+        <div class="container">
 
+            <h2>You are logged in as: <%= overviewData[0].username %></h2><br/>
+            <h4>Use the navigation bar to perform administrator tasks</h4><br/><br/>
 
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Orders To Date</th>
+                        <th scope="col">Total Order Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><%= overviewData[0].numOrders %></td>
+                        <td>$<%= overviewData[0].totalRev %></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
 
     </main>
 

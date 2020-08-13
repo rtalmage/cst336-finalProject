@@ -9,8 +9,10 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
-// Global object
-let productObject; let cartObj = [];;
+// Global objects
+let productObject; // Object that stores the values from the Walmart API
+let cartObj = []; // Object that stores the items in the user cart
+let overviewData = []; // Object that will be passed to adminPortal
 
 // Landing Page Route
 app.get("/", function(req, res){
@@ -65,9 +67,6 @@ app.get("/cart", function(req, res){
                 "productPrice": productObject[index].productPrice
             }
         );
-
-        // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
-        // console.log("Object Length: " + cartObj.length);
     }
 
     // Else, The user pressed the 'cart' btn in the header.ejs file
@@ -86,16 +85,59 @@ app.get("/login", function(req, res){
 app.post("/login", async function(req, res){
     let username = req.body.username;
     let password = req.body.password;
-    // res.send("Username: " + username + "<br/>Password: " + password);
 
     let authenticateUser = await verifyAdmin(username, password);
 
     if(authenticateUser){
-        res.render("adminPortal", {"username": username});
+        let numOrders = await getNumOrders();
+        let totalRev = await getTotalRevenue();
+
+        // Add data to overviewData object
+        overviewData.push(
+            {
+                username: username,
+                numOrders: numOrders,
+                totalRev: totalRev
+            }
+        );
+
+        res.render("adminPortal", {"overviewData": overviewData});
     }
     else{
         res.send("Username or password is incorrect");
     }
+});
+
+// Admin Overview Page, same view as successful admin login
+app.get("/adminOverview", function(req, res){
+
+    res.render("adminPortal", {"overviewData": overviewData});
+});
+
+// Admin Orders Page
+app.get("/adminOrders", function(req, res){
+
+    res.render("adminOrders");
+});
+
+// Admin View Users
+app.get("/adminViewUsers", function(req, res){
+    res.render("adminUsers");
+});
+
+// Admin View Admins
+app.get("/adminViewAdmins", function(req, res){
+    res.render("adminViewAdmins");
+});
+
+// Helper route for ajax call on adminOrders.ejs page
+app.get("/populateOrders", async function(req, res){
+    
+    let orders = await getAllOrders();
+
+    console.log("\nCLICKED!!!\NAdminOrders: " + orders);
+
+    res.send(orders);
 });
 
 /*
@@ -148,7 +190,7 @@ function getProducts(sport){
  * @return {boolean} true if found, false otherwise
 */
 function verifyAdmin(username, password){
-    let sqlUsername = "SELECT * FROM users WHERE username =?";
+    let sqlUsername = "SELECT * FROM admin WHERE username =?";
     let authenticated;
 
     return new Promise(function(resolve, reject){
@@ -190,6 +232,68 @@ function verifyPassword(password, hashedPassword){
             resolve(result);
         });//bcrypt
     });//promise
+}
+
+/* 
+ * Returns the number of orders in the database
+ * @return {int} numOrders
+*/
+function getAllOrders(){
+    let getOrders = ("SELECT * FROM orders");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, async function(err, rows, fields){
+            if(err) throw err;
+            console.log("\nRows[0]: " + rows[0]);
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/* 
+ * Returns the number of orders in the database
+ * @return {int} numOrders
+*/
+function getNumOrders(){
+    let getOrders = ("SELECT * FROM orders");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, async function(err, rows, fields){
+            if(err) throw err;
+            numOrders = rows.length;
+            console.log("\nNumber of Orders: " + numOrders + "\nTypeOf: " + typeof(numOrders));
+
+            resolve(numOrders);
+        });//Orders query
+
+    });//Promise
+}
+
+/* 
+ * Returns the sum of all orders in the database
+ * @return {int} totalRev
+*/
+function getTotalRevenue(){
+    let getRev = ("SELECT SUM(order_amount) AS totalRev FROM orders");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets total revenue in database
+        conn.query(getRev, async function(err, rows, fields){
+            if(err) throw err;
+            totalRev = rows[0].totalRev;
+            console.log("Total Rev: " + totalRev + "\nTypeOf: " + typeof(totalRev));
+
+            resolve(totalRev);
+        });//Revenue query
+
+    });//Promise
 }
 
 // Starting Server on local machine (For Dev)
