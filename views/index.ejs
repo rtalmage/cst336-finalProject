@@ -1,9 +1,81 @@
 <%- include('partials/header.ejs') %>
 
 <body>
+<%
+let date = new Date();
 
+%>
     <main>
+        <br>
+        <h3 class="text-center">Welcome to Small 5! Your time of visting is <%= date.toLocaleString("en-US") %></h3>
+        <div class="container">
+           <div class="row">
 
+               <div class="col-lg card-columns">
+                   <div class="card" style="width: 18rem;">
+                       <h5 class="card-title">Baseball</h5>
+                       <img class="img-fluid" src="img/baseball.jpeg">
+                       <div class="card-body">
+                           <a class="btn btn-primary" href="/sport?sportSelection=baseball">See Items</a>
+                       </div>
+                   </div>
+               </div>
+
+               <div class="col-lg card-columns">
+                   <div class="card" style="width: 18rem;">
+                       <h5 class="card-title">Cycling</h5>
+                       <img class="img-fluid" src="img/cycling.png">
+                       <div class="card-body">
+                           <a class="btn btn-primary" href="/sport?sportSelection=cycling">See Items</a>
+                       </div>
+                   </div>
+               </div>
+
+               <div class="col-lg card-columns">
+                   <div class="card" style="width: 18rem;">
+                       <h5 class="card-title">Fitness</h5>
+                       <img class="img-fluid" src="img/fitness.jpg">
+                       <div class="card-body">
+                           <a class="btn btn-primary" href="/sport?sportSelection=fitness">See Items</a>
+                       </div>
+                   </div>
+               </div>
+
+               <div class="row">
+
+                   <div class="col-lg card-columns">
+                       <div class="card" style="width: 18rem;">
+                           <h5 class="card-title">Football</h5>
+                           <img class="img-fluid" src="img/football.jpeg">
+                           <div class="card-body">
+                               <a class="btn btn-primary" href="/sport?sportSelection=football">See Items</a>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="col-lg card-columns">
+                       <div class="card" style="width: 18rem;">
+                           <h5 class="card-title">Soccer</h5>
+                           <img class="img-fluid" src="img/soccer.jpg">
+                           <div class="card-body">
+                               <a class="btn btn-primary" href="/sport?sportSelection=soccer">See Items</a>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="col-lg card-columns">
+                       <div class="card" style="width: 18rem;">
+                           <h5 class="card-title">Apparel</h5>
+                           <img class="img-fluid" src="img/apparel.jpg">
+                           <div class="card-body">
+                               <a class="btn btn-primary" href="/search?itemSearch=workout clothes">See Items</a>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+
+           </div>
+        </div>
     </main>
 
 <%- include('partials/footer.ejs') %>
