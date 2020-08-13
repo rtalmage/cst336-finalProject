@@ -10,7 +10,7 @@ app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
 // Global object
-let productObject; let cartObj = []; let total = 0;
+let productObject; let cartObj = [];
 
 // Landing Page Route
 app.get("/", function(req, res){
@@ -51,7 +51,7 @@ app.get("/cart", function(req, res){
     let index = req.query.index; // Stores index of cart item selected
     let indexDel = req.query.indexDel;
     let qty = req.query.qty;
-    
+    let total = 0;
 
     // If 'add to cart' btn triggered this route
     if(index){
@@ -85,7 +85,7 @@ app.get("/cart", function(req, res){
 });
 
 app.post("/cart", function(req, res) {
-    placeOrder(1123, total, cartObj, Date.now());
+    placeOrder(1123, req.body.total, cartObj, Date.now());
     res.render('/confirmation');
 });
 
