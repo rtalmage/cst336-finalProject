@@ -46,17 +46,16 @@ $(document).ready(function(){
     function sendOrdersToView(){
         $.ajax({ 
             method: 'GET', 
-            url: '/adminOrders',
+            url: '/populateOrders',
             success: function(data, status) {
 
                 $("#orderTableContents").html("");
                 let htmlString = "";
                 data.forEach(function(row){
-                    htmlString += "<tr><td><%= row.order_id %></td>";
-                    htmlString += "<td><%= row.order_amount %></td>";
-                    htmlString += "<td><%= row.order_items %></td>";
-                    htmlString += "<td><%= row.date %></td>";
-                    htmlString += "<td><%= row.user_id %></td></tr>";
+                    htmlString += "<tr><td>" + row.order_id + "</td>";
+                    htmlString += "<td>" + row.order_amount + "</td>";
+                    htmlString += "<td>" + row.date + "</td>";
+                    htmlString += "<td>" + row.user_id + "</td></tr>";
                 });
         
                 $("#orderTableContents").append(htmlString);
