@@ -42,7 +42,13 @@ app.get("/search", async function(req, res){
 
     productObject = await getProducts(itemSearch); // Create and store object with API info
 
-    res.render("sports", {"productObject": productObject});
+    if(productObject == undefined){
+        res.render("itemNotFound");
+    }
+
+    else {
+        res.render("sports", {"productObject": productObject});
+    }
 });
 
 // Shopping Cart Route
@@ -122,7 +128,7 @@ function getProducts(sport){
         let requestUrl = `http://api.walmartlabs.com/v1/search?query=${sport}&format=json&apiKey=7eksjp57nqzw9hnb9hsudh93`;
 
         request(requestUrl, function(error, response, body){
-            if(!error && response.statusCode == 200){
+            if(!error && response.statusCode == 200 && JSON.parse(body).items != undefined){
                 let parsedData = JSON.parse(body);
                 let productObject = []; // Declare Product Object
 
@@ -131,13 +137,15 @@ function getProducts(sport){
 
                 // Fill object with Name, Price, and ImageUrl for first <= 10 results
                 for(let i = 0; i < count; i++){
-                    productObject.push(
-                        {
-                            productName: parsedData.items[i].name,
-                            productPrice: parsedData.items[i].salePrice,
-                            productImagePath: parsedData.items[i].imageEntities[0].mediumImage
-                        }
-                    );
+                    try {
+                        productObject.push(
+                            {
+                                productName: parsedData.items[i].name,
+                                productPrice: parsedData.items[i].salePrice,
+                                productImagePath: parsedData.items[i].imageEntities[0].mediumImage
+                            }
+                        );
+                    } catch(error){}
                 }
 
                 resolve(productObject); // Use resolve to return the productObject
@@ -148,7 +156,7 @@ function getProducts(sport){
                 reject(error); // Use reject to pass error value
             }
         });
-    });
+    }).catch(function(error){});
 }
 
 /*
