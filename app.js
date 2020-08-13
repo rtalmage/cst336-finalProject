@@ -108,8 +108,10 @@ app.get("/cart", function(req, res){
 });
 
 app.get("/cart/checkout", function(req, res) {
-    placeOrder(total, cartObj, Date.now());
-    res.render('/confirmation');
+    placeOrder(total, new Date().toISOString(), 123);
+    res.render("confirmation", {"cartObj": cartObj, "total": total});
+    total = 0;
+    cartObj = [];
 });
 
 // Admin Login Page
@@ -227,10 +229,18 @@ function verifyPassword(password, hashedPassword){
     });//promise
 }
 
-function placeOrder(orderAmount, items, date) {
-    let sql = "INSERT INTO orders VALUES (?,?,?,?)";
+function placeOrder(orderAmount, date, userID) {
+    let sql = "INSERT INTO orders (order_amount, date, user_id) VALUES (?, ?, ?)";
        
-    conn.query(sql, [orderAmount, items, date], function(err, rows, fields){
+    conn.query(sql, [orderAmount, date, userID], function(err, rows, fields){
+        if(err) throw err;
+    });
+}
+
+function createItem (id, name) {
+    let sql = "INSERT INTO items (item_id, item_name) VALUES (?, ?)";
+       
+    conn.query(sql, [id, name], function(err, rows, fields) {
         if(err) throw err;
     });
 }
