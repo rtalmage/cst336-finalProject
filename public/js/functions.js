@@ -29,7 +29,7 @@ $(document).ready(function(){
      * @param {int} index
      * @return {object}
     */
-    function sendIndexToCart(index){
+    function sendIndexToCart(index) {
 
         $.ajax({ 
             method: 'GET', 

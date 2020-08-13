@@ -10,7 +10,7 @@ app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
 // Global object
-let productObject; let cartObj = [];
+let productObject; let cartObj = []; let total = 0;
 
 // Landing Page Route
 app.get("/", function(req, res){
@@ -51,7 +51,7 @@ app.get("/cart", function(req, res){
     let index = req.query.index; // Stores index of cart item selected
     let indexDel = req.query.indexDel;
     let qty = req.query.qty;
-    let total = 0;
+    total = 0;
 
     // If 'add to cart' btn triggered this route
     if(index){
@@ -84,8 +84,8 @@ app.get("/cart", function(req, res){
 
 });
 
-app.post("/cart", function(req, res) {
-    placeOrder(1123, req.body.total, cartObj, Date.now());
+app.get("/cart/checkout", function(req, res) {
+    placeOrder(total, cartObj, Date.now());
     res.render('/confirmation');
 });
 
@@ -202,13 +202,11 @@ function verifyPassword(password, hashedPassword){
     });//promise
 }
 
-function placeOrder(userid, orderAmount, items, date) {
+function placeOrder(orderAmount, items, date) {
     let sql = "INSERT INTO orders VALUES (?,?,?,?)";
-    
-    return new Promise(function(resolve, reject) {
-        conn.query(sql, [userid, orderAmount, items, date], async function(err, rows, fields){
-            if(err) throw err;
-        });
+       
+    conn.query(sql, [orderAmount, items, date], function(err, rows, fields){
+        if(err) throw err;
     });
 }
 

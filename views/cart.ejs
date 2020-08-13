@@ -19,9 +19,9 @@
                 Subtotal: $<%= (total).toFixed(2) %><br>
                 Total: $<%= (total+(total*0.0975)).toFixed(2) %>
                 <a href="/cart" class="btn btn-warning" id="updateCart">Update cart</a><br/><br/>
-                <form action="/cart" method="POST">
-                    <label for="checkoutBtn">Proceed to checkout<input type="button" class="btn btn-success" id="checkoutBtn">
-                </form>
+                <a href="/cart/checkout" class="btn btn-success" id="checkoutBtn">Proceed to checkout</a>
+               
+              
             
 
                 <% for(let i = 0; i < cartObj.length; i++){
