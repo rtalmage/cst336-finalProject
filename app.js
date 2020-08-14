@@ -509,9 +509,6 @@ function getAdminByUsername(username){
  * Deletes user based off user_id
 */
 function deleteUserByUsername(username){
-    return new Promise(function(resolve, reject){
-
-        if(getUserByUsername(username)){
             let deleteUser = ("DELETE FROM user WHERE username =?");
 
             // Deletes Username in DB
@@ -519,13 +516,6 @@ function deleteUserByUsername(username){
                 if(err) throw err;
             });//Orders query
 
-            resolve(true);
-        }
-        else{
-            resolve(false);
-        }
-
-    });//Promise
 }
 
 /*
