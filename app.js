@@ -89,11 +89,11 @@ app.get("/cart", function(req, res){
 
         // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
         // console.log("Object Length: " + cartObj.length);
-    } 
+    }
     else if(indexDel) {
         cartObj.splice(indexDel,1);
     }
-    
+
     else if(qty){
         cartObj[req.query.qtyIndex].productAmount = qty;
     }
@@ -188,7 +188,7 @@ function getProducts(sport){
  * @return {boolean} true if found, false otherwise
 */
 function verifyAdmin(username, password){
-    let sqlUsername = "SELECT * FROM user WHERE username =?";
+    let sqlUsername = "SELECT * FROM users WHERE username =?";
     let authenticated;
 
     return new Promise(function(resolve, reject){
