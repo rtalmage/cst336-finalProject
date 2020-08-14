@@ -28,6 +28,7 @@ $(document).ready(function(){
         $("#orders-table").show();
         $("#total-revenue").hide();
         $("#search-by-num").hide();
+        
         sendOrdersToView();
     });
 
@@ -36,6 +37,7 @@ $(document).ready(function(){
         $("#total-revenue").show();
         $("#orders-table").hide();
         $("#search-by-num").hide();
+
         sendRevenueToView();
     });
 
@@ -47,6 +49,7 @@ $(document).ready(function(){
 
         $("#admin-search-btn").click(function(){
             let searchVal = $("#ordersSearch").val();
+
             sendSearchToView(searchVal);
         });
     });
@@ -56,6 +59,7 @@ $(document).ready(function(){
         $("#users-table").show();
         $("#search-by-user").hide();
         $("#delete-by-user").hide();
+
         sendUsersToView();
     });
 
@@ -67,6 +71,7 @@ $(document).ready(function(){
         
         $("#admin-search-user-btn").click(function(){
             let searchVal = $("#userSearch").val();
+
             sendSearchUsersToView(searchVal);
         });
     });
@@ -79,6 +84,7 @@ $(document).ready(function(){
 
         $("#admin-delete-user-btn").click(function(){
             let searchVal = $("#delete-user-Search").val();
+
             deleteUsersFromDB(searchVal);
         });
     });
@@ -88,6 +94,7 @@ $(document).ready(function(){
         $("#admin-table").show();
         $("#search-by-admin").hide();
         $("#add-admin-field").hide();
+
         sendAdminsToView();
     });
 
@@ -99,6 +106,7 @@ $(document).ready(function(){
         
         $("#admin-search-admin-btn").click(function(){
             let searchVal = $("#adminSearch").val();
+
             sendSearchAdminsToView(searchVal);
         });
     });
@@ -112,7 +120,7 @@ $(document).ready(function(){
         $("#admin-add-admin-btn").click(function(){
             let username = $("#admin-add-username").val();
             let password = $("#admin-add-password").val();
-            console.log(username + password);
+ 
             addAdminToDB(username, password);
         });
     });
@@ -324,7 +332,7 @@ $(document).ready(function(){
     }
 
     /*
-    * Searches for matching order_id in the orders table.
+    * Delete users from DB.
     */
     function deleteUsersFromDB(searchVal){
         $.ajax({ 
@@ -337,7 +345,7 @@ $(document).ready(function(){
                 $("#delete-message").html("");
                 let htmlString = "";
 
-                console.log("data: " + data.result[0] + ", status: " + status);
+                // console.log("data: " + data.result[0] + ", status: " + status);
 
                 // if(data[0].result == true){
                 //     console.log("Data Found");
@@ -396,7 +404,7 @@ $(document).ready(function(){
     }
 
     /*
-    * Searches for matching order_id in the orders table.
+    * Searches for matching admin username in the admin table.
     */
     function sendSearchAdminsToView(searchVal){
         $.ajax({ 
@@ -448,7 +456,7 @@ $(document).ready(function(){
                 $("#delete-message").html("");
                 let htmlString = "";
 
-                console.log("success");
+                // console.log("success");
 
                 // if(data[0].result == true){
                 //     console.log("Data Found");

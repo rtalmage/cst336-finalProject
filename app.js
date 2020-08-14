@@ -516,7 +516,6 @@ function addAdminToDB(username, password){
 
         bcrypt.hash(password, saltRounds).then(function(hash) {
             hashedPwd = hash;
-            console.log(hashedPwd);
 
             // Add admins to DB
             conn.query(addAdmin, [username, hashedPwd], async function(err, rows, fields){
