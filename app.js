@@ -9,8 +9,11 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
-// Global object
-let productObject; let cartObj = []; let total = 0;
+// Global objects
+let productObject; // Object that stores the values from the Walmart API
+let cartObj = []; // Object that stores the items in the user cart
+let overviewData = []; // Object that will be passed to adminPortal
+let total = 0;
 
 // Landing Page Route
 app.get("/", function(req, res){
@@ -86,9 +89,6 @@ app.get("/cart", function(req, res){
                 "productPrice": productObject[index].productPrice
             }
         );
-
-        // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
-        // console.log("Object Length: " + cartObj.length);
     }
     else if(indexDel) {
         cartObj.splice(indexDel,1);
@@ -126,16 +126,135 @@ app.get("/login", function(req, res){
 app.post("/login", async function(req, res){
     let username = req.body.username;
     let password = req.body.password;
-    // res.send("Username: " + username + "<br/>Password: " + password);
 
     let authenticateUser = await verifyAdmin(username, password);
 
     if(authenticateUser){
-        res.render("adminPortal", {"username": username});
+        let numOrders = await getNumOrders();
+        let totalRev = await getTotalRevenue();
+
+        // Add data to overviewData object
+        overviewData.push(
+            {
+                username: username,
+                numOrders: numOrders,
+                totalRev: totalRev
+            }
+        );
+
+        res.render("adminPortal", {"overviewData": overviewData});
     }
     else{
         res.send("Username or password is incorrect");
     }
+});
+
+// Admin Overview Page, same view as successful admin login
+app.get("/adminOverview", function(req, res){
+
+    res.render("adminPortal", {"overviewData": overviewData});
+});
+
+// Admin Orders Page
+app.get("/adminOrders", function(req, res){
+
+    res.render("adminOrders");
+});
+
+// Admin View Users
+app.get("/adminViewUsers", function(req, res){
+    res.render("adminUsers");
+});
+
+// Admin View Admins
+app.get("/adminViewAdmins", function(req, res){
+    res.render("adminViewAdmins");
+});
+
+// Helper route for ajax call on adminOrders.ejs page
+app.get("/populateOrders", async function(req, res){
+
+    let orders = await getAllOrders();
+
+    res.send(orders);
+});
+
+// Helper route for ajax call on adminOrders.ejs page
+app.get("/populateRevenue", async function(req, res){
+
+    let revenue = await getTotalRevenue();
+    let revObject = [{totalRev: revenue}]; // Send as object
+
+    res.send(revObject);
+});
+
+// Helper route for ajax call on adminOrders.ejs page
+app.get("/populateSearchOrders", async function(req, res){
+
+    let searchVal = req.query.searchVal;
+
+    let resultObject = await getOrderById(searchVal);
+
+    res.send(resultObject);
+});
+
+// Helper route for ajax call on adminUsers.ejs page
+app.get("/populateUsers", async function(req, res){
+
+    let users = await getAllUsers(); // Store user object
+
+    res.send(users);
+});
+
+// Helper route for ajax call on adminUsers.ejs page
+app.get("/populateSearchUsers", async function(req, res){
+
+    let username = req.query.searchVal;
+
+    let resultObject = await getUserByUsername(username);
+
+    res.send(resultObject);
+});
+
+// Helper route for ajax call on adminViewAdmins.ejs page
+app.get("/populateAdmins", async function(req, res){
+
+    let admins = await getAllAdmins(); // Store user object
+
+    res.send(admins);
+});
+
+// Helper route for ajax call on adminViewAdmins.ejs page
+app.get("/populateSearchAdmins", async function(req, res){
+
+    let username = req.query.searchVal;
+
+    let resultObject = await getAdminByUsername(username);
+
+    res.send(resultObject);
+});
+
+// Helper route for ajax call on adminUsers.ejs page
+app.get("/deleteUser", async function(req, res){
+
+    let username = req.query.searchVal;
+
+    let result = deleteUserByUsername(username);
+
+    let resultObj = [{result: result}];
+
+    res.send(resultObj);
+});
+
+// Helper route for ajax call on adminViewAdmins.ejs page
+app.get("/addAdmin", async function(req, res){
+
+    let username = req.query.username;
+    let password = req.query.password;
+
+    let result = addAdminToDB(username, password);
+
+    res.send(result);
 });
 
 /*
@@ -188,7 +307,7 @@ function getProducts(sport){
  * @return {boolean} true if found, false otherwise
 */
 function verifyAdmin(username, password){
-    let sqlUsername = "SELECT * FROM users WHERE username =?";
+    let sqlUsername = "SELECT * FROM admin WHERE username =?";
     let authenticated;
 
     return new Promise(function(resolve, reject){
@@ -230,6 +349,206 @@ function verifyPassword(password, hashedPassword){
             resolve(result);
         });//bcrypt
     });//promise
+}
+
+/*
+ * Returns the number of orders in the database
+ * @return {int} numOrders
+*/
+function getAllOrders(){
+    let getOrders = ("SELECT * FROM orders");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/*
+ * Returns the number of orders in the database
+ * @return {int} numOrders
+*/
+function getNumOrders(){
+    let getOrders = ("SELECT * FROM orders");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, async function(err, rows, fields){
+            if(err) throw err;
+            numOrders = rows.length;
+
+            resolve(numOrders);
+        });//Orders query
+
+    });//Promise
+}
+
+/*
+ * Returns the sum of all orders in the database
+ * @return {int} totalRev
+*/
+function getTotalRevenue(){
+    let getRev = ("SELECT SUM(order_amount) AS totalRev FROM orders");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets total revenue in database
+        conn.query(getRev, async function(err, rows, fields){
+            if(err) throw err;
+            totalRev = rows[0].totalRev;
+
+            resolve(totalRev);
+        });//Revenue query
+
+    });//Promise
+}
+
+/*
+ * Returns orders based off order_id
+ * @return {object} ordersById
+*/
+function getOrderById(orderId){
+    let getOrders = ("SELECT * FROM orders WHERE order_id =?");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, [orderId], async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/*
+ * Returns All Users in DB
+ * @return {object} userObject
+*/
+function getAllUsers(){
+    let getUsers = ("SELECT * FROM user");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getUsers, async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/*
+ * Returns users based off user_id
+ * @return {object} ordersById
+*/
+function getUserByUsername(username){
+    let getOrders = ("SELECT * FROM user WHERE username =?");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, [username], async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/*
+ * Returns All Admins in DB
+ * @return {object} adminsObject
+*/
+function getAllAdmins(){
+    let getAdmins = ("SELECT * FROM admin");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getAdmins, async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/*
+ * Returns users based off user_id
+ * @return {object} ordersById
+*/
+function getAdminByUsername(username){
+    let getOrders = ("SELECT * FROM admin WHERE username =?");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, [username], async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/*
+ * Deletes user based off user_id
+*/
+function deleteUserByUsername(username){
+    return new Promise(function(resolve, reject){
+
+        if(getUserByUsername(username)){
+            let deleteUser = ("DELETE FROM user WHERE username =?");
+
+            // Deletes Username in DB
+            conn.query(deleteUser, [username], async function(err, rows, fields){
+                if(err) throw err;
+            });//Orders query
+
+            resolve(true);
+        }
+        else{
+            resolve(false);
+        }
+
+    });//Promise
+}
+
+/*
+ * Deletes user based off user_id
+*/
+function addAdminToDB(username, password){
+    let addAdmin = ("INSERT INTO admin (username, password) VALUES(?, ?)");
+
+    return new Promise(function(resolve, reject){
+        let saltRounds = 10;
+        let hashedPwd = "";
+
+        bcrypt.hash(password, saltRounds).then(function(hash) {
+            hashedPwd = hash;
+
+            // Add admins to DB
+            conn.query(addAdmin, [username, hashedPwd], async function(err, rows, fields){
+                if(err) throw err;
+                resolve(true);
+            });//Orders query
+        });//bcrypt
+
+    });//Promise
 }
 
 function placeOrder(orderAmount, date, userID) {

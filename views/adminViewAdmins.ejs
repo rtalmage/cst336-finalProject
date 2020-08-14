@@ -1,0 +1,67 @@
+<%- include('partials/headerAdmin.ejs') %>
+
+<body class="text-center">
+
+    <main>
+
+        <div class="container">
+
+            <h2>USERS</h2>
+
+            <div class="row">
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="viewAllAdmins">View All Administrators</button>
+                </div>
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="searchByAdminUsername">Search By Username</button>
+                </div>
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="addAdmin">Add Administrator</button>
+                </div>
+            </div>
+            
+            <hr/><br/>
+
+            <table class="table" id="admin-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Admin Id</th>
+                        <th scope="col">Username</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableContents">
+                    
+                </tbody>
+            </table>
+
+            <div id="search-by-admin">
+                <input type="text" id="adminSearch" placeholder="Enter username">
+                <button type="submit" class="btn btn-primary" id="admin-search-admin-btn">Search</button><br/><br/>
+
+                <table class="table" id="search-admin-results">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Admin Id</th>
+                            <th scope="col">Username</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchAdminContents">
+                        
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="add-admin-field">
+                <input type="text" id="admin-add-username" placeholder="Enter username">
+                <input type="password" id="admin-add-password" placeholder="Enter Password">
+                <button type="submit" class="btn btn-primary" id="admin-add-admin-btn">Add</button><br/><br/>
+            </div>
+
+        </div>
+
+    </main>
+
+<%- include('partials/footer.ejs') %>
+
+</body>
+</html>
