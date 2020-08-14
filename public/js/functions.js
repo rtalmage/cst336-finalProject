@@ -7,6 +7,12 @@ $(document).ready(function(){
         sendIndexToCart(index);
     });
 
+    $("#checkoutBtn").on("click", function(){
+        let username = $("#username").val().toString();
+
+        sendUsernameToCheckout(username);
+    });
+
     /*
      * Sends the index to the /cart route in the controller.
      * This index is used to populate the cart object data
@@ -21,6 +27,17 @@ $(document).ready(function(){
             data: {
                 "index": index
             },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("some error");
+            }
+        });
+    }
+
+    function sendUsernameToCheckout(username){
+        $.ajax({
+            method: 'GET',
+            url: '/cart/checkout',
+            data: {"username": username},
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("some error");
             }

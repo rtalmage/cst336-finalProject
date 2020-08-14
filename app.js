@@ -9,6 +9,9 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
+// Global object
+let productObject; let cartObj = []; let total = 0;
+
 // Landing Page Route
 app.get("/", function(req, res){
 
@@ -25,10 +28,20 @@ app.get("/about", function(req, res){
 app.get("/sport", async function(req, res){
 
     let sportSelection = req.query.sportSelection; // Obtain user's selection from Navbar
+    let filterSelection = req.query.filterSelection; // Obtain user's filter selection
 
-    let productObject = await getProducts(sportSelection); // Create and store object with API info
+    productObject = await getProducts(sportSelection); // Create and store object with API info
+    productObject = await getProducts(sportSelection); // Create and store object with API info
+    // Sort by user's filter selection
+    if(filterSelection == "az") {
+        productObject.sort((a, b) => (a.productName > b.productName) ? 1 : -1);
+    }
 
-    res.render("sports", {"productObject": productObject});
+    if(filterSelection == "price") {
+        productObject.sort((a, b) => (a.productPrice > b.productPrice) ? 1 : -1);
+    }
+
+    res.render("sports", {"productObject": productObject, "sportSelection": sportSelection});
 
 });
 
@@ -36,22 +49,72 @@ app.get("/sport", async function(req, res){
 app.get("/search", async function(req, res){
 
     let itemSearch = req.query.itemSearch; // Obtain user's search string
+    let filterSelection = req.query.filterSelection; // Obtain user's filter selection
 
     let productObject = await getProducts(itemSearch); // Create and store object with API info
 
     if(productObject == undefined){
         res.render("itemNotFound");
     }
-
-    else {
-        res.render("sports", {"productObject": productObject});
+    //Sort by user's filter selection
+    if(filterSelection == "az") {
+        productObject.sort((a, b) => (a.productName > b.productName) ? 1 : -1);
     }
+
+    if(filterSelection == "price") {
+        productObject.sort((a, b) => (a.productPrice > b.productPrice) ? 1 : -1);
+    }
+
+    res.render("sports", {"productObject": productObject, "itemSearch": itemSearch});
 });
 
 // Shopping Cart Route
 app.get("/cart", function(req, res){
 
-    res.render("cart");
+    let index = req.query.index; // Stores index of cart item selected
+    let indexDel = req.query.indexDel;
+    let qty = req.query.qty;
+    total = 0;
+
+    // If 'add to cart' btn triggered this route
+    if(index){
+        cartObj.push(
+            {
+                "productAmount": 1,
+                "productName": productObject[index].productName,
+                "productImagePath": productObject[index].productImagePath,
+                "productPrice": productObject[index].productPrice
+            }
+        );
+
+        // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
+        // console.log("Object Length: " + cartObj.length);
+    }
+    else if(indexDel) {
+        cartObj.splice(indexDel,1);
+    }
+
+    else if(qty){
+        cartObj[req.query.qtyIndex].productAmount = qty;
+    }
+
+    // Else, The user pressed the 'cart' btn in the header.ejs file
+    else{
+        for(let i = 0; i < cartObj.length; i++) {
+            total += (cartObj[i].productPrice * cartObj[i].productAmount);
+        }
+        res.render("cart", {"cartObj": cartObj, "total": total});
+    }
+
+});
+
+app.get("/cart/checkout", async function(req, res) {
+   // let username = req.query.username;
+    //let user_id = await createUser(username);
+    placeOrder(total, new Date().toISOString().slice(0, 10), 3);
+    res.render("confirmation", {"cartObj": cartObj, "total": total});
+    total = 0;
+    cartObj = [];
 });
 
 // Admin Login Page
@@ -169,8 +232,42 @@ function verifyPassword(password, hashedPassword){
     });//promise
 }
 
+function placeOrder(orderAmount, date, userID) {
+    let sql = "INSERT INTO orders (order_amount, date, user_id) VALUES (?, ?, ?)";
+
+    conn.query(sql, [orderAmount, date, userID], function(err, rows, fields){
+        if(err) throw err;
+    });
+}
+
+function createItem (id, name) {
+    let sql = "INSERT INTO items (item_id, item_name) VALUES (?, ?)";
+
+    conn.query(sql, [id, name], function(err, rows, fields) {
+        if(err) throw err;
+    });
+}
+
+/*function createUser(username) {
+    let sqlUsername = "SELECT * FROM user WHERE username =?";
+    let sqlNewUser = "INSERT INTO user (username) VALUES (?)";
+    return new Promise(function(resolve, reject){
+        conn.query(sqlNewUser, [username], async function (err, rows, fields) {
+            if(err) throw err;
+        });
+        conn.query(sqlUsername, [username], async function (err, rows, fields){
+            if(err) throw err;
+            console.log(rows[0].user_id);
+            resolve(rows[0].user_id);
+        });
+
+    });
+}*/
+
 // Starting Server on local machine (For Dev)
-app.listen(process.env.PORT || 5000);
+app.listen("8080", "127.0.0.1", function(){
+    console.log("Express server is running...");
+});
 
 // Starting Server for Web Hosting Environment 
 // app.listen(process.env.PORT, process.env.IP, function(){

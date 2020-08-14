@@ -15,7 +15,18 @@
             <% if(cartObj.length > 0 ){ %>
 
                 <br/><h2><strong>Your Shopping Cart</strong></h2>
-                <a class="btn btn-success" id="checkoutBtn">Proceed To Checkout</a><br/><br/>
+                <br/><br>
+
+                <div class="list-group" style="width: 30%; margin: auto;">
+                    <a class="list-group-item list-group-item-action" id="subtotal">Subtotal: $<%= (total).toFixed(2) %></a>
+                    <a class="list-group-item list-group-item-action" id="total">Total: $<%= (total+(total*0.0975)).toFixed(2) %></a>
+                </div>
+                <br/>
+                <a href="/cart" class="btn btn-warning" id="updateCart">Update cart</a><br/><br/>
+                <a href="/cart/checkout" class="btn btn-success" id="checkoutBtn">Proceed to checkout</a>
+                <label>Enter Username:</label><input type="text" id="username">
+              
+            
 
                 <% for(let i = 0; i < cartObj.length; i++){
                 
@@ -29,7 +40,8 @@
                                 <img class="img-fluid sportImage" src="<%= cartObj[i].productImagePath %>" class="card-img-top" alt="Product Image">
                                 <div class="card-body">
                                     <p class="card-text sportPrice">Price: $<%= cartObj[i].productPrice %></p>
-                                    <a class="btn btn-danger deletecartbtn" id="<%= i %>">Remove From Cart</a>
+                                    <a href="/cart" class="btn btn-danger deletecartbtn" id="<%= i %>">Remove From Cart</a>
+                                    <br/><span><label for="quantity">Quantity:</label><input type="number" id="<%= i %>" name="quantity" class="qtyBox" value="<%= cartObj[i].productAmount %>" min="1" max="20"></span>
                                 </div>
                             </div>
                         </div>
