@@ -13,6 +13,7 @@ app.use(express.urlencoded({extended:true})); // Middleware to be able to parse 
 let productObject; // Object that stores the values from the Walmart API
 let cartObj = []; // Object that stores the items in the user cart
 let overviewData = []; // Object that will be passed to adminPortal
+let total = 0;
 
 // Landing Page Route
 app.get("/", function(req, res){
@@ -74,23 +75,46 @@ app.get("/search", async function(req, res){
 app.get("/cart", function(req, res){
 
     let index = req.query.index; // Stores index of cart item selected
+    let indexDel = req.query.indexDel;
+    let qty = req.query.qty;
+    total = 0;
 
     // If 'add to cart' btn triggered this route
     if(index){
         cartObj.push(
             {
+                "productAmount": 1,
                 "productName": productObject[index].productName,
                 "productImagePath": productObject[index].productImagePath,
                 "productPrice": productObject[index].productPrice
             }
         );
     }
+    else if(indexDel) {
+        cartObj.splice(indexDel,1);
+    }
+
+    else if(qty){
+        cartObj[req.query.qtyIndex].productAmount = qty;
+    }
 
     // Else, The user pressed the 'cart' btn in the header.ejs file
     else{
-        res.render("cart", {"cartObj": cartObj});
+        for(let i = 0; i < cartObj.length; i++) {
+            total += (cartObj[i].productPrice * cartObj[i].productAmount);
+        }
+        res.render("cart", {"cartObj": cartObj, "total": total});
     }
 
+});
+
+app.get("/cart/checkout", async function(req, res) {
+   // let username = req.query.username;
+    //let user_id = await createUser(username);
+    placeOrder(total, new Date().toISOString().slice(0, 10), 3);
+    res.render("confirmation", {"cartObj": cartObj, "total": total});
+    total = 0;
+    cartObj = [];
 });
 
 // Admin Login Page
@@ -149,7 +173,7 @@ app.get("/adminViewAdmins", function(req, res){
 
 // Helper route for ajax call on adminOrders.ejs page
 app.get("/populateOrders", async function(req, res){
-    
+
     let orders = await getAllOrders();
 
     res.send(orders);
@@ -157,7 +181,7 @@ app.get("/populateOrders", async function(req, res){
 
 // Helper route for ajax call on adminOrders.ejs page
 app.get("/populateRevenue", async function(req, res){
-    
+
     let revenue = await getTotalRevenue();
     let revObject = [{totalRev: revenue}]; // Send as object
 
@@ -168,7 +192,7 @@ app.get("/populateRevenue", async function(req, res){
 app.get("/populateSearchOrders", async function(req, res){
 
     let searchVal = req.query.searchVal;
-    
+
     let resultObject = await getOrderById(searchVal);
 
     res.send(resultObject);
@@ -186,7 +210,7 @@ app.get("/populateUsers", async function(req, res){
 app.get("/populateSearchUsers", async function(req, res){
 
     let username = req.query.searchVal;
-    
+
     let resultObject = await getUserByUsername(username);
 
     res.send(resultObject);
@@ -204,7 +228,7 @@ app.get("/populateAdmins", async function(req, res){
 app.get("/populateSearchAdmins", async function(req, res){
 
     let username = req.query.searchVal;
-    
+
     let resultObject = await getAdminByUsername(username);
 
     res.send(resultObject);
@@ -327,7 +351,7 @@ function verifyPassword(password, hashedPassword){
     });//promise
 }
 
-/* 
+/*
  * Returns the number of orders in the database
  * @return {int} numOrders
 */
@@ -346,7 +370,7 @@ function getAllOrders(){
     });//Promise
 }
 
-/* 
+/*
  * Returns the number of orders in the database
  * @return {int} numOrders
 */
@@ -366,7 +390,7 @@ function getNumOrders(){
     });//Promise
 }
 
-/* 
+/*
  * Returns the sum of all orders in the database
  * @return {int} totalRev
 */
@@ -386,7 +410,7 @@ function getTotalRevenue(){
     });//Promise
 }
 
-/* 
+/*
  * Returns orders based off order_id
  * @return {object} ordersById
 */
@@ -405,7 +429,7 @@ function getOrderById(orderId){
     });//Promise
 }
 
-/* 
+/*
  * Returns All Users in DB
  * @return {object} userObject
 */
@@ -424,7 +448,7 @@ function getAllUsers(){
     });//Promise
 }
 
-/* 
+/*
  * Returns users based off user_id
  * @return {object} ordersById
 */
@@ -443,7 +467,7 @@ function getUserByUsername(username){
     });//Promise
 }
 
-/* 
+/*
  * Returns All Admins in DB
  * @return {object} adminsObject
 */
@@ -462,7 +486,7 @@ function getAllAdmins(){
     });//Promise
 }
 
-/* 
+/*
  * Returns users based off user_id
  * @return {object} ordersById
 */
@@ -481,7 +505,7 @@ function getAdminByUsername(username){
     });//Promise
 }
 
-/* 
+/*
  * Deletes user based off user_id
 */
 function deleteUserByUsername(username){
@@ -504,7 +528,7 @@ function deleteUserByUsername(username){
     });//Promise
 }
 
-/* 
+/*
  * Deletes user based off user_id
 */
 function addAdminToDB(username, password){
@@ -526,6 +550,38 @@ function addAdminToDB(username, password){
 
     });//Promise
 }
+
+function placeOrder(orderAmount, date, userID) {
+    let sql = "INSERT INTO orders (order_amount, date, user_id) VALUES (?, ?, ?)";
+
+    conn.query(sql, [orderAmount, date, userID], function(err, rows, fields){
+        if(err) throw err;
+    });
+}
+
+function createItem (id, name) {
+    let sql = "INSERT INTO items (item_id, item_name) VALUES (?, ?)";
+
+    conn.query(sql, [id, name], function(err, rows, fields) {
+        if(err) throw err;
+    });
+}
+
+/*function createUser(username) {
+    let sqlUsername = "SELECT * FROM user WHERE username =?";
+    let sqlNewUser = "INSERT INTO user (username) VALUES (?)";
+    return new Promise(function(resolve, reject){
+        conn.query(sqlNewUser, [username], async function (err, rows, fields) {
+            if(err) throw err;
+        });
+        conn.query(sqlUsername, [username], async function (err, rows, fields){
+            if(err) throw err;
+            console.log(rows[0].user_id);
+            resolve(rows[0].user_id);
+        });
+
+    });
+}*/
 
 // Starting Server on local machine (For Dev)
 app.listen("8080", "127.0.0.1", function(){

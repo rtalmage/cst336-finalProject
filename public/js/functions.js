@@ -23,12 +23,18 @@ $(document).ready(function(){
         sendIndexToCart(index);
     });
 
+    $("#checkoutBtn").on("click", function(){
+        let username = $("#username").val().toString();
+
+        sendUsernameToCheckout(username);
+    });
+
     // View-all-orders onclick listener
     $("#viewAllOrders").click(function(){
         $("#orders-table").show();
         $("#total-revenue").hide();
         $("#search-by-num").hide();
-        
+
         sendOrdersToView();
     });
 
@@ -68,7 +74,7 @@ $(document).ready(function(){
         $("#search-by-user").show();
         $("#users-table").hide();
         $("#delete-by-user").hide();
-        
+
         $("#admin-search-user-btn").click(function(){
             let searchVal = $("#userSearch").val();
 
@@ -103,7 +109,7 @@ $(document).ready(function(){
         $("#search-by-admin").show();
         $("#admin-table").hide();
         $("#add-admin-field").hide();
-        
+
         $("#admin-search-admin-btn").click(function(){
             let searchVal = $("#adminSearch").val();
 
@@ -120,7 +126,7 @@ $(document).ready(function(){
         $("#admin-add-admin-btn").click(function(){
             let username = $("#admin-add-username").val();
             let password = $("#admin-add-password").val();
- 
+
             addAdminToDB(username, password);
         });
     });
@@ -150,8 +156,8 @@ $(document).ready(function(){
      * Inserts order data to view with bootstrap table styling.
     */
     function sendOrdersToView(){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/populateOrders',
             success: function(data, status) {
                 $("#orderTableContents").html("");
@@ -172,7 +178,7 @@ $(document).ready(function(){
                         htmlString += "<td>" + row.date + "</td>";
                         htmlString += "<td>" + row.user_id + "</td></tr>";
                     });
-            
+
                     $("#orderTableContents").append(htmlString);
                     $("#orderTableContents").css("color", "black");
                 }
@@ -187,8 +193,8 @@ $(document).ready(function(){
      * Retrieves total revenue from database and sends it to the view.
     */
     function sendRevenueToView(){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/populateRevenue',
             success: function(data, status) {
                 $("#total-revenue").html("");
@@ -206,7 +212,7 @@ $(document).ready(function(){
                     data.forEach(function(row){
                         htmlString += "<h6>Total Revenue To Date: $" + row.totalRev + "</h6>";
                     });
-            
+
                     $("#total-revenue").append(htmlString);
                     $("#total-revenue").css("color", "black");
                 }
@@ -221,8 +227,8 @@ $(document).ready(function(){
     * Searches for matching order_id in the orders table.
     */
     function sendSearchToView(searchVal){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/populateSearchOrders',
             data: {
                 "searchVal": searchVal
@@ -246,7 +252,7 @@ $(document).ready(function(){
                         htmlString += "<td>" + row.date + "</td>";
                         htmlString += "<td>" + row.user_id + "</td></tr>";
                     });
-            
+
                     $("#searchTableContents").append(htmlString);
                     $("#searchTableContents").css("color", "black");
                 }
@@ -261,8 +267,8 @@ $(document).ready(function(){
     * Sends all existing users in DB to the view.
     */
     function sendUsersToView(){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/populateUsers',
 
             success: function(data, status) {
@@ -282,7 +288,7 @@ $(document).ready(function(){
                         htmlString += "<tr><td>" + row.user_id + "</td>";
                         htmlString += "<td>" + row.username + "</td></tr>";
                     });
-            
+
                     $("#userTableContents").append(htmlString);
                     $("#userTableContents").css("color", "black");
                 }
@@ -297,8 +303,8 @@ $(document).ready(function(){
     * Searches for matching order_id in the orders table.
     */
     function sendSearchUsersToView(searchVal){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/populateSearchUsers',
             data: {
                 "searchVal": searchVal
@@ -320,7 +326,7 @@ $(document).ready(function(){
                         htmlString += "<tr><td>" + row.user_id + "</td>";
                         htmlString += "<td>" + row.username + "</td></tr>";
                     });
-            
+
                     $("#searchUserContents").append(htmlString);
                     $("#searchUserContents").css("color", "black");
                 }
@@ -335,8 +341,8 @@ $(document).ready(function(){
     * Delete users from DB.
     */
     function deleteUsersFromDB(searchVal){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/deleteUser',
             data: {
                 "searchVal": searchVal
@@ -359,7 +365,7 @@ $(document).ready(function(){
                 //     $("#delete-message").append(htmlString);
                 //     $("#delete-message").css("color", "red");
                 // }
-            
+
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("some error");
@@ -371,8 +377,8 @@ $(document).ready(function(){
     * Sends all existing admins in DB to the view.
     */
     function sendAdminsToView(){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/populateAdmins',
 
             success: function(data, status) {
@@ -392,7 +398,7 @@ $(document).ready(function(){
                         htmlString += "<tr><td>" + row.admin_id + "</td>";
                         htmlString += "<td>" + row.username + "</td></tr>";
                     });
-            
+
                     $("#adminTableContents").append(htmlString);
                     $("#adminTableContents").css("color", "black");
                 }
@@ -407,8 +413,8 @@ $(document).ready(function(){
     * Searches for matching admin username in the admin table.
     */
     function sendSearchAdminsToView(searchVal){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/populateSearchAdmins',
             data: {
                 "searchVal": searchVal
@@ -430,7 +436,7 @@ $(document).ready(function(){
                         htmlString += "<tr><td>" + row.admin_id + "</td>";
                         htmlString += "<td>" + row.username + "</td></tr>";
                     });
-            
+
                     $("#searchAdminContents").append(htmlString);
                     $("#searchAdminContents").css("color", "black");
                 }
@@ -445,8 +451,8 @@ $(document).ready(function(){
     * Add administrator to DB
     */
     function addAdminToDB(username, password){
-        $.ajax({ 
-            method: 'GET', 
+        $.ajax({
+            method: 'GET',
             url: '/addAdmin',
             data: {
                 "username": username,
@@ -470,8 +476,19 @@ $(document).ready(function(){
                 //     $("#delete-message").append(htmlString);
                 //     $("#delete-message").css("color", "red");
                 // }
-            
+
             },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("some error");
+            }
+        });
+    }
+
+    function sendUsernameToCheckout(username){
+        $.ajax({
+            method: 'GET',
+            url: '/cart/checkout',
+            data: {"username": username},
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("some error");
             }
