@@ -107,11 +107,12 @@ app.get("/cart", function(req, res){
 
 });
 
-app.get("/cart/checkout", function(req, res) {
+app.get("/cart/checkout", async function(req, res) {
     let username = req.body.username;
-    let user_id = await createUser();
-
-    placeOrder(total, new Date().toISOString(), 123);
+    console.log(username);
+    let user_id = await createUser(username);
+    console.log(user_id);
+    placeOrder(total,  "2020-08-13", user_id);
     res.render("confirmation", {"cartObj": cartObj, "total": total});
     total = 0;
     cartObj = [];
@@ -245,28 +246,33 @@ function createItem (id, name) {
        
     conn.query(sql, [id, name], function(err, rows, fields) {
         if(err) throw err;
-    });
+    }).catch();
 }
 
 function createUser(username){
     let sqlUsername = "SELECT * FROM user WHERE username =?";
+    let sqlNewUser = "INSERT INTO user (username) VALUE (?)";
     let user_id = "";
     return new Promise(function(resolve, reject){
         conn.query(sqlUsername, [username], async function(err, rows, fields){
             if(err) throw err;
 
-            if(rows) {
-                rows.forEach(function (row) {
-                    if (row.username == username) {
-                        user_id = row.user_id;
-                        resolve(user_id);
-                    }
+            if(rows.length > 0) {
+                resolve(rows[0].user_id);
+            }
+            else {
+                console.log("here");
+                conn.query(sqlNewUser, [username], async function (err, rows, fields) {
+                    if(err) throw err;
+
+                    conn.query(sqlUsername, [username], async function (err, rows, fields){
+                       if(err) throw err;
+                        resolve(rows[0].user_id);
+                    });
                 });
             }
-
-            resolve();
         });//query
-    });//promise
+    }).catch();
 }
 
 // Starting Server on local machine (For Dev)
