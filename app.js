@@ -119,8 +119,9 @@ app.get("/cart/checkout", async function(req, res) {
    // let username = req.query.username;
     //let user_id = await createUser(username);
     placeOrder(total, new Date().toISOString().slice(0, 10), 3);
+    console.log("total: " + total);
     res.render("confirmation", {"cartObj": cartObj, "total": total});
-    total = 0;
+
     cartObj = [];
 });
 
