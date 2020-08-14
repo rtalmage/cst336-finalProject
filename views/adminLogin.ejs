@@ -2,9 +2,8 @@
 
 <body class="text-center">
 
-    <main>
-
-        <div class="container">
+<main>
+    <div class="container">
             <form method="POST">
                 <div class="form-group">
                     <label for="username">Enter Username:</label>
@@ -16,6 +15,9 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
+        <%if(loginError){ %>
+            <div class="text-danger">Incorrect Login!</div>
+        <%}%>
         </div>
 
     </main>
