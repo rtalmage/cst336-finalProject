@@ -210,6 +210,29 @@ app.get("/populateSearchAdmins", async function(req, res){
     res.send(resultObject);
 });
 
+// Helper route for ajax call on adminUsers.ejs page
+app.get("/deleteUser", async function(req, res){
+
+    let username = req.query.searchVal;
+
+    let result = deleteUserByUsername(username);
+
+    let resultObj = [{result: result}];
+
+    res.send(resultObj);
+});
+
+// Helper route for ajax call on adminViewAdmins.ejs page
+app.get("/addAdmin", async function(req, res){
+
+    let username = req.query.username;
+    let password = req.query.password;
+
+    let result = addAdminToDB(username, password);
+
+    res.send(result);
+});
+
 /*
  * Get sport products from Walmart API.
  * @param {string} sport
@@ -454,6 +477,53 @@ function getAdminByUsername(username){
 
             resolve(rows);
         });//Orders query
+
+    });//Promise
+}
+
+/* 
+ * Deletes user based off user_id
+*/
+function deleteUserByUsername(username){
+    return new Promise(function(resolve, reject){
+
+        if(getUserByUsername(username)){
+            let deleteUser = ("DELETE FROM user WHERE username =?");
+
+            // Deletes Username in DB
+            conn.query(deleteUser, [username], async function(err, rows, fields){
+                if(err) throw err;
+            });//Orders query
+
+            resolve(true);
+        }
+        else{
+            resolve(false);
+        }
+
+    });//Promise
+}
+
+/* 
+ * Deletes user based off user_id
+*/
+function addAdminToDB(username, password){
+    let addAdmin = ("INSERT INTO admin (username, password) VALUES(?, ?)");
+
+    return new Promise(function(resolve, reject){
+        let saltRounds = 10;
+        let hashedPwd = "";
+
+        bcrypt.hash(password, saltRounds).then(function(hash) {
+            hashedPwd = hash;
+            console.log(hashedPwd);
+
+            // Add admins to DB
+            conn.query(addAdmin, [username, hashedPwd], async function(err, rows, fields){
+                if(err) throw err;
+                resolve(true);
+            });//Orders query
+        });//bcrypt
 
     });//Promise
 }

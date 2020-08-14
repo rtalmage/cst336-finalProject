@@ -8,10 +8,12 @@ $(document).ready(function(){
     // Hide tables and data until clicked in adminUsers
     $("#users-table").hide();
     $("#search-by-user").hide();
+    $("#delete-by-user").hide();
 
     // Hide tables and data until clicked in adminViewAdmins
     $("#search-by-admin").hide();
     $("#admin-table").hide();
+    $("#add-admin-field").hide();
 
     // Add-to-cart onlcick listener
     $(".addcartbtn").on("click", function() {
@@ -53,6 +55,7 @@ $(document).ready(function(){
     $("#viewAllUsers").click(function(){
         $("#users-table").show();
         $("#search-by-user").hide();
+        $("#delete-by-user").hide();
         sendUsersToView();
     });
 
@@ -60,6 +63,7 @@ $(document).ready(function(){
     $("#searchByUsername").click(function(){
         $("#search-by-user").show();
         $("#users-table").hide();
+        $("#delete-by-user").hide();
         
         $("#admin-search-user-btn").click(function(){
             let searchVal = $("#userSearch").val();
@@ -67,10 +71,23 @@ $(document).ready(function(){
         });
     });
 
+    // Delete user onclick listener
+    $("#delete-user").click(function(){
+        $("#delete-by-user").show();
+        $("#search-by-user").hide();
+        $("#users-table").hide();
+
+        $("#admin-delete-user-btn").click(function(){
+            let searchVal = $("#delete-user-Search").val();
+            deleteUsersFromDB(searchVal);
+        });
+    });
+
     // View all user onclick listener
     $("#viewAllAdmins").click(function(){
         $("#admin-table").show();
         $("#search-by-admin").hide();
+        $("#add-admin-field").hide();
         sendAdminsToView();
     });
 
@@ -78,10 +95,25 @@ $(document).ready(function(){
     $("#searchByAdminUsername").click(function(){
         $("#search-by-admin").show();
         $("#admin-table").hide();
+        $("#add-admin-field").hide();
         
         $("#admin-search-admin-btn").click(function(){
             let searchVal = $("#adminSearch").val();
             sendSearchAdminsToView(searchVal);
+        });
+    });
+
+    // Add admin onclick listener
+    $("#addAdmin").click(function(){
+        $("#add-admin-field").show();
+        $("#search-by-admin").hide();
+        $("#admin-table").hide();
+
+        $("#admin-add-admin-btn").click(function(){
+            let username = $("#admin-add-username").val();
+            let password = $("#admin-add-password").val();
+            console.log(username + password);
+            addAdminToDB(username, password);
         });
     });
 
@@ -292,6 +324,42 @@ $(document).ready(function(){
     }
 
     /*
+    * Searches for matching order_id in the orders table.
+    */
+    function deleteUsersFromDB(searchVal){
+        $.ajax({ 
+            method: 'GET', 
+            url: '/deleteUser',
+            data: {
+                "searchVal": searchVal
+            },
+            success: function(data, status) {
+                $("#delete-message").html("");
+                let htmlString = "";
+
+                console.log("data: " + data.result[0] + ", status: " + status);
+
+                // if(data[0].result == true){
+                //     console.log("Data Found");
+                //     htmlString += "<tr><td>" + searchVal + " Deleted Successfully</td></tr>";
+                //     $("#delete-message").append(htmlString);
+                //     $("#delete-message").css("color", "black");
+                // }
+                // else{
+                //     console.log("Data NOOOT Found");
+                //     htmlString += "<tr><td>Error Deleting: " + searchVal + "</td></tr>";
+                //     $("#delete-message").append(htmlString);
+                //     $("#delete-message").css("color", "red");
+                // }
+            
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("some error");
+            }
+        });
+    }
+
+    /*
     * Sends all existing admins in DB to the view.
     */
     function sendAdminsToView(){
@@ -358,6 +426,43 @@ $(document).ready(function(){
                     $("#searchAdminContents").append(htmlString);
                     $("#searchAdminContents").css("color", "black");
                 }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("some error");
+            }
+        });
+    }
+
+    /*
+    * Add administrator to DB
+    */
+    function addAdminToDB(username, password){
+        $.ajax({ 
+            method: 'GET', 
+            url: '/addAdmin',
+            data: {
+                "username": username,
+                "password": password
+            },
+            success: function(data, status) {
+                $("#delete-message").html("");
+                let htmlString = "";
+
+                console.log("success");
+
+                // if(data[0].result == true){
+                //     console.log("Data Found");
+                //     htmlString += "<tr><td>" + searchVal + " Deleted Successfully</td></tr>";
+                //     $("#delete-message").append(htmlString);
+                //     $("#delete-message").css("color", "black");
+                // }
+                // else{
+                //     console.log("Data NOOOT Found");
+                //     htmlString += "<tr><td>Error Deleting: " + searchVal + "</td></tr>";
+                //     $("#delete-message").append(htmlString);
+                //     $("#delete-message").css("color", "red");
+                // }
+            
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert("some error");
