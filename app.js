@@ -108,6 +108,9 @@ app.get("/cart", function(req, res){
 });
 
 app.get("/cart/checkout", function(req, res) {
+    let username = req.body.username;
+    let user_id = await createUser();
+
     placeOrder(total, new Date().toISOString(), 123);
     res.render("confirmation", {"cartObj": cartObj, "total": total});
     total = 0;
@@ -243,6 +246,27 @@ function createItem (id, name) {
     conn.query(sql, [id, name], function(err, rows, fields) {
         if(err) throw err;
     });
+}
+
+function createUser(username){
+    let sqlUsername = "SELECT * FROM user WHERE username =?";
+    let user_id = "";
+    return new Promise(function(resolve, reject){
+        conn.query(sqlUsername, [username], async function(err, rows, fields){
+            if(err) throw err;
+
+            if(rows) {
+                rows.forEach(function (row) {
+                    if (row.username == username) {
+                        user_id = row.user_id;
+                        resolve(user_id);
+                    }
+                });
+            }
+
+            resolve();
+        });//query
+    });//promise
 }
 
 // Starting Server on local machine (For Dev)
