@@ -107,8 +107,10 @@ app.get("/cart", function(req, res){
 
 });
 
-app.get("/cart/checkout", function(req, res) {
-    placeOrder(total, new Date().toISOString(), 123);
+app.get("/cart/checkout", async function(req, res) {
+   // let username = req.query.username;
+    //let user_id = await createUser(username);
+    placeOrder(total, new Date().toISOString().slice(0, 10), 3);
     res.render("confirmation", {"cartObj": cartObj, "total": total});
     total = 0;
     cartObj = [];
@@ -185,7 +187,7 @@ function getProducts(sport){
  * @return {boolean} true if found, false otherwise
 */
 function verifyAdmin(username, password){
-    let sqlUsername = "SELECT * FROM users WHERE username =?";
+    let sqlUsername = "SELECT * FROM user WHERE username =?";
     let authenticated;
 
     return new Promise(function(resolve, reject){
@@ -244,6 +246,22 @@ function createItem (id, name) {
         if(err) throw err;
     });
 }
+
+/*function createUser(username) {
+    let sqlUsername = "SELECT * FROM user WHERE username =?";
+    let sqlNewUser = "INSERT INTO user (username) VALUES (?)";
+    return new Promise(function(resolve, reject){
+        conn.query(sqlNewUser, [username], async function (err, rows, fields) {
+            if(err) throw err;
+        });
+        conn.query(sqlUsername, [username], async function (err, rows, fields){
+            if(err) throw err;
+            console.log(rows[0].user_id);
+            resolve(rows[0].user_id);
+        });
+
+    });
+}*/
 
 // Starting Server on local machine (For Dev)
 app.listen("8080", "127.0.0.1", function(){
