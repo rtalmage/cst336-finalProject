@@ -9,6 +9,13 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); // Use public folder for all static files
 app.use(express.urlencoded({extended:true})); // Middleware to be able to parse POST parameters
 
+// Set required parameters to use sessions
+app.use(session({
+    secret: "top secret!",
+    resave: true,
+    saveUninitialized: true
+}));
+
 // Global objects
 let productObject; // Object that stores the values from the Walmart API
 let cartObj = []; // Object that stores the items in the user cart
@@ -119,20 +126,28 @@ app.get("/cart/checkout", async function(req, res) {
 
 // Admin Login Page
 app.get("/login", function(req, res){
-    res.render("adminLogin");
+    let loginError = req.query.loginError;
+    if(loginError){
+        res.render("adminLogin", {"loginError": loginError});
+    }
+    else {
+        res.render("adminLogin", {"loginError": false});
+    }
 });
 
 // Admin POST route, calls verifyAdmin()
 app.post("/login", async function(req, res){
     let username = req.body.username;
     let password = req.body.password;
+    overviewData = [];
 
     let authenticateUser = await verifyAdmin(username, password);
 
     if(authenticateUser){
+        req.session.authenticated = true;
         let numOrders = await getNumOrders();
         let totalRev = await getTotalRevenue();
-
+        console.log(req.session.authenticated);
         // Add data to overviewData object
         overviewData.push(
             {
@@ -145,30 +160,50 @@ app.post("/login", async function(req, res){
         res.render("adminPortal", {"overviewData": overviewData});
     }
     else{
-        res.send("Username or password is incorrect");
+        console.log(req.session.authenticated);
+        res.redirect("/login?loginError=true");
     }
 });
 
 // Admin Overview Page, same view as successful admin login
 app.get("/adminOverview", function(req, res){
+    if(req.session.authenticated == true){
+        res.render("adminPortal", {"overviewData": overviewData});
+    }
+    else{
+        res.redirect("/login");
+    }
 
-    res.render("adminPortal", {"overviewData": overviewData});
 });
 
 // Admin Orders Page
 app.get("/adminOrders", function(req, res){
-
-    res.render("adminOrders");
+    if(req.session.authenticated == true) {
+        res.render("adminOrders");
+    }
+    else{
+        res.redirect("/login");
+    }
 });
 
 // Admin View Users
 app.get("/adminViewUsers", function(req, res){
-    res.render("adminUsers");
+    if(req.session.authenticated == true) {
+        res.render("adminUsers");
+    }
+    else{
+        res.redirect("/login");
+    }
 });
 
 // Admin View Admins
 app.get("/adminViewAdmins", function(req, res){
-    res.render("adminViewAdmins");
+    if(req.session.authenticated == true) {
+        res.render("adminViewAdmins");
+    }
+    else{
+        res.redirect("/login");
+    }
 });
 
 // Helper route for ajax call on adminOrders.ejs page
@@ -255,6 +290,12 @@ app.get("/addAdmin", async function(req, res){
     let result = addAdminToDB(username, password);
 
     res.send(result);
+});
+
+// Logout route. Destroys current session
+app.get("/logout", function(req, res){
+    req.session.destroy();
+    res.redirect("/");
 });
 
 /*
