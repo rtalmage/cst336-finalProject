@@ -152,9 +152,26 @@ app.get("/populateOrders", async function(req, res){
     
     let orders = await getAllOrders();
 
-    console.log("\nCLICKED!!!\NAdminOrders: " + orders);
-
     res.send(orders);
+});
+
+// Helper route for ajax call on adminOrders.ejs page
+app.get("/populateRevenue", async function(req, res){
+    
+    let revenue = await getTotalRevenue();
+    let revObject = [{totalRev: revenue}]; // Send as object
+
+    res.send(revObject);
+});
+
+// Helper route for ajax call on adminOrders.ejs page
+app.get("/populateSearch", async function(req, res){
+
+    let searchVal = req.query.searchVal;
+    
+    let resultObject = await getOrderById(searchVal);
+
+    res.send(resultObject);
 });
 
 /*
@@ -263,7 +280,6 @@ function getAllOrders(){
         // Gets number of orders
         conn.query(getOrders, async function(err, rows, fields){
             if(err) throw err;
-            console.log("\nRows[0]: " + rows[0]);
 
             resolve(rows);
         });//Orders query
@@ -284,7 +300,6 @@ function getNumOrders(){
         conn.query(getOrders, async function(err, rows, fields){
             if(err) throw err;
             numOrders = rows.length;
-            console.log("\nNumber of Orders: " + numOrders + "\nTypeOf: " + typeof(numOrders));
 
             resolve(numOrders);
         });//Orders query
@@ -305,10 +320,28 @@ function getTotalRevenue(){
         conn.query(getRev, async function(err, rows, fields){
             if(err) throw err;
             totalRev = rows[0].totalRev;
-            console.log("Total Rev: " + totalRev + "\nTypeOf: " + typeof(totalRev));
 
             resolve(totalRev);
         });//Revenue query
+
+    });//Promise
+}
+
+/* 
+ * Returns orders based off order_id
+ * @return {object} ordersById
+*/
+function getOrderById(orderId){
+    let getOrders = ("SELECT * FROM orders WHERE order_id =?");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, [orderId], async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
 
     });//Promise
 }

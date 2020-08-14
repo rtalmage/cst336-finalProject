@@ -20,9 +20,9 @@
                 </div>
             </div>
             
-            <hr/>
+            <hr/><br/>
 
-            <table class="table">
+            <table class="table" id="orders-table">
                 <thead class="thead-dark">
                     <tr>
                         <th scope="col">Order Id</th>
@@ -35,6 +35,29 @@
                     
                 </tbody>
             </table>
+
+            <div id="total-revenue"></div>
+
+            <div id="search-by-num">
+                <input type="text" id="ordersSearch" placeholder="Enter Order Id">
+                <button type="submit" class="btn btn-primary" id="admin-search-btn">Search</button><br/><br/>
+
+                <table class="table" id="search-table-results">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Order Id</th>
+                            <th scope="col">Order Amount</th>
+                            <th scope="col">Order Date</th>
+                            <th scope="col">User Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchTableContents">
+                        
+                    </tbody>
+                </table>
+            </div>
+
+
 
         </div>
 
