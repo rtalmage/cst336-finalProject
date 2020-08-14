@@ -86,6 +86,7 @@ app.get("/cart", function(req, res){
                 "productPrice": productObject[index].productPrice
             }
         );
+
         // cartObj.length > 0 ? console.dir(cartObj) : console.log("Call Made, nothing received");
         // console.log("Object Length: " + cartObj.length);
     } 
@@ -233,7 +234,7 @@ function verifyPassword(password, hashedPassword){
 
 function placeOrder(orderAmount, date, userID) {
     let sql = "INSERT INTO orders (order_amount, date, user_id) VALUES (?, ?, ?)";
-       
+
     conn.query(sql, [orderAmount, date, userID], function(err, rows, fields){
         if(err) throw err;
     });
@@ -241,7 +242,7 @@ function placeOrder(orderAmount, date, userID) {
 
 function createItem (id, name) {
     let sql = "INSERT INTO items (item_id, item_name) VALUES (?, ?)";
-       
+
     conn.query(sql, [id, name], function(err, rows, fields) {
         if(err) throw err;
     });
