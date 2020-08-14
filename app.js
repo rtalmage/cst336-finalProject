@@ -165,11 +165,47 @@ app.get("/populateRevenue", async function(req, res){
 });
 
 // Helper route for ajax call on adminOrders.ejs page
-app.get("/populateSearch", async function(req, res){
+app.get("/populateSearchOrders", async function(req, res){
 
     let searchVal = req.query.searchVal;
     
     let resultObject = await getOrderById(searchVal);
+
+    res.send(resultObject);
+});
+
+// Helper route for ajax call on adminUsers.ejs page
+app.get("/populateUsers", async function(req, res){
+
+    let users = await getAllUsers(); // Store user object
+
+    res.send(users);
+});
+
+// Helper route for ajax call on adminUsers.ejs page
+app.get("/populateSearchUsers", async function(req, res){
+
+    let username = req.query.searchVal;
+    
+    let resultObject = await getUserByUsername(username);
+
+    res.send(resultObject);
+});
+
+// Helper route for ajax call on adminViewAdmins.ejs page
+app.get("/populateAdmins", async function(req, res){
+
+    let admins = await getAllAdmins(); // Store user object
+
+    res.send(admins);
+});
+
+// Helper route for ajax call on adminViewAdmins.ejs page
+app.get("/populateSearchAdmins", async function(req, res){
+
+    let username = req.query.searchVal;
+    
+    let resultObject = await getAdminByUsername(username);
 
     res.send(resultObject);
 });
@@ -338,6 +374,82 @@ function getOrderById(orderId){
 
         // Gets number of orders
         conn.query(getOrders, [orderId], async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/* 
+ * Returns All Users in DB
+ * @return {object} userObject
+*/
+function getAllUsers(){
+    let getUsers = ("SELECT * FROM user");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getUsers, async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/* 
+ * Returns users based off user_id
+ * @return {object} ordersById
+*/
+function getUserByUsername(username){
+    let getOrders = ("SELECT * FROM user WHERE username =?");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, [username], async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/* 
+ * Returns All Admins in DB
+ * @return {object} adminsObject
+*/
+function getAllAdmins(){
+    let getAdmins = ("SELECT * FROM admin");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getAdmins, async function(err, rows, fields){
+            if(err) throw err;
+
+            resolve(rows);
+        });//Orders query
+
+    });//Promise
+}
+
+/* 
+ * Returns users based off user_id
+ * @return {object} ordersById
+*/
+function getAdminByUsername(username){
+    let getOrders = ("SELECT * FROM admin WHERE username =?");
+
+    return new Promise(function(resolve, reject){
+
+        // Gets number of orders
+        conn.query(getOrders, [username], async function(err, rows, fields){
             if(err) throw err;
 
             resolve(rows);

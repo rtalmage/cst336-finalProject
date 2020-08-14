@@ -4,7 +4,53 @@
 
     <main>
 
-        <h2>USERS</h2>
+        <div class="container">
+
+            <h2>USERS</h2>
+
+            <div class="row">
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="viewAllUsers">View All Users</button>
+                </div>
+                <div class="col-lg">
+                    <button type="button" class="btn btn-primary orders-btn" id="searchByUsername">Search By Username</button>
+                </div>
+            </div>
+            
+            <hr/><br/>
+
+            <table class="table" id="users-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">User Id</th>
+                        <th scope="col">Username</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableContents">
+                    
+                </tbody>
+            </table>
+
+            <div id="search-by-user">
+                <input type="text" id="userSearch" placeholder="Enter username">
+                <button type="submit" class="btn btn-primary" id="admin-search-user-btn">Search</button><br/><br/>
+
+                <table class="table" id="search-user-results">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">User Id</th>
+                            <th scope="col">Username</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchUserContents">
+                        
+                    </tbody>
+                </table>
+            </div>
+
+
+
+        </div>
 
     </main>
 
